@@ -1,0 +1,84 @@
+
+<html>  
+<head>
+<meta name="viewport" content="initial-scale=1.0, width=device-width" />
+<script src="https://js.api.here.com/v3/3.1/mapsjs-core.js"type="text/javascript" charset="utf-8"></script>
+<script src="https://js.api.here.com/v3/3.1/mapsjs-service.js"type="text/javascript" charset="utf-8"></script>
+<script src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://js.api.here.com/v3/3.1/mapsjs-ui.js" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css"href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+</head>
+  
+<body style='margin: 0'>
+<div style="width: 100%; height: 100%" id="mapContainer"></div>
+
+<script>  
+      // Initialize the platform object:
+      var platform = new H.service.Platform({
+        'apikey': '{{apikey}}'
+      });
+    
+     var dataList = {{data}};
+     const wearHouselatitude = dataList[0];
+     const wearHouselongitude = dataList[1];
+     const clientsLatitude =dataList[2];
+     const clientsLongitude =dataList[3];
+
+     // Obtain the default map types from the platform object
+      var maptypes = platform.createDefaultLayers();
+      var map = new H.Map(
+      document.getElementById('mapContainer'),
+      maptypes.raster.terrain.map,
+      {
+        zoom: 9,
+        center: { lat: 7.873054, lng: 80.771797 }  
+      });
+      
+  // Enable the event system on the map instance:
+    var mapEvents = new H.mapevents.MapEvents(map);
+  
+  // Instantiate the default behavior, providing the mapEvents object:
+   var behavior = new H.mapevents.Behavior(mapEvents);
+
+   window.addEventListener('resize',()=> get.ViewProt().resize())
+  
+  // Add the marker to the map:
+   var x=0;
+    while(x<clientsLatitude.length){
+      var marker = AddMarker(clientsLatitude[x],clientsLongitude[x],'clients');
+      map.addObject(marker);
+      x++;
+    }
+    var x=0;
+    while(x<wearHouselatitude.length){
+      var marker = AddMarker(wearHouselatitude[x],wearHouselongitude[x],'wearHouse');
+      map.addObject(marker);
+      x++;
+    }
+  // Create the default UI:
+  var ui = H.ui.UI.createDefault(map, maptypes);
+  
+  function AddMarker(lat,lon,type){
+    var svgMarkup = '';
+    if(type=='clients'){
+      svgMarkup = '<svg width="24" height="24" ' +
+                  'xmlns="http://www.w3.org/2000/svg">' +
+                  '<rect stroke="white" fill="#f4356" x="1" y="1" width="22" ' +
+                  'height="22" /><text x="12" y="18" font-size="12pt" ' +
+                  'font-family="Arial" font-weight="bold" text-anchor="middle" ' +
+                  'fill="white">C</text></svg>';
+    }
+    else if (type=='wearHouse'){
+      svgMarkup = '<svg width="24" height="24" ' +
+                  'xmlns="http://www.w3.org/2000/svg">' +
+                  '<rect stroke="white" fill="#f94114" x="1" y="1" width="22" ' +
+                  'height="22" /><text x="12" y="18" font-size="12pt" ' +
+                  'font-family="Arial" font-weight="bold" text-anchor="middle" ' +
+                  'fill="white">W</text></svg>';
+    }
+    var icon = new H.map.DomIcon(svgMarkup);
+    return new H.map.DomMarker({ lat: lat, lng: lon },{icon: icon});
+  }
+</script>
+</body>
+</html>
